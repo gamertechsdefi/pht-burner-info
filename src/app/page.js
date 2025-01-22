@@ -6,130 +6,153 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
+const addCommas = (number) => {
+  // Ensure the number is a valid number
+  if (isNaN(number)) return number;
 
+  // Round to 3 decimal places and separate the integer part and decimal part
+  const [integerPart, decimalPart] = number.toFixed(3).split('.');
+
+  // Add commas to the integer part
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  // Return the formatted integer part combined with the decimal part (if any)
+  return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+};
 
 export default function Home() {
 
+  const [burnt, setBurnt] = useState(null);
+  const [formattedBurnt, setFormattedBurnt] = useState(null);
   const [tokenData, setTokenData] = useState(null);
   const [supply, setSupply] = useState(null);
   const [circulatorySupply, setCSupply] = useState(null);
-  const [burnt, setBurnt] = useState(null);
   const [locked, setLocked] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingTokenData, setLoadingTokenData] = useState(true);
+  const [loadingSupply, setLoadingSupply] = useState(true);
+  const [loadingCirculatorySupply, setLoadingCirculatorySupply] = useState(true);
+  const [loadingBurnt, setLoadingBurnt] = useState(true);
+  const [loadingLocked, setLoadingLocked] = useState(true);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(null);
 
+  // Fetch token data
   useEffect(() => {
-    async function fetchData() {
+    async function fetchTokenData() {
+      setLoadingTokenData(true);
       try {
         const response = await fetch('/api/tokenPrice');
         const data = await response.json();
-
         if (!response.ok) {
           throw new Error(data.message || 'Failed to fetch token data');
         }
-
         setTokenData(data);
       } catch (error) {
         setError(error.message);
         console.error('Error:', error);
       } finally {
-        setLoading(false);
+        setLoadingTokenData(false);
       }
     }
+    fetchTokenData();
 
-    fetchData();
-
-    // Update every 30 seconds
-    const interval = setInterval(fetchData, 30000);
+    const interval = setInterval(fetchTokenData, 30000);
     return () => clearInterval(interval);
   }, []);
 
-
+  // Fetch supply data
   useEffect(() => {
     async function fetchSupply() {
+      setLoadingSupply(true);
       try {
         const response = await fetch('/api/tokenSupply');
         const data = await response.json();
-
         if (!response.ok) {
           throw new Error(data.message || 'Failed to fetch token supply');
         }
-
-        setSupply(data.totalSupply);
+        const formattedSupply = addCommas(data.totalSupply); // Apply addCommas here
+        setSupply(formattedSupply);
       } catch (error) {
         setError(error.message);
         console.error('Error:', error);
       } finally {
-        setLoading(false);
+        setLoadingSupply(false);
       }
     }
-
     fetchSupply();
   }, []);
 
+  // Fetch circulatory supply data
   useEffect(() => {
     async function fetchCSupply() {
+      setLoadingCirculatorySupply(true);
       try {
         const response = await fetch('/api/circulatorySupply');
         const data = await response.json();
-
         if (!response.ok) {
-          throw new Error(data.message || 'Failed to fetch token circulatory supply');
+          throw new Error(data.message || 'Failed to fetch circulatory supply');
         }
-
-        setCSupply(data.circulatorySupply);
+        const formattedCirculatorySupply = addCommas(data.circulatorySupply); // Apply addCommas here
+        setCSupply(formattedCirculatorySupply);
       } catch (error) {
         setError(error.message);
         console.error('Error:', error);
       } finally {
-        setLoading(false);
+        setLoadingCirculatorySupply(false);
       }
     }
-
     fetchCSupply();
   }, []);
 
+  // Fetch burnt data
   useEffect(() => {
     async function fetchBurnt() {
+      setLoadingBurnt(true);
       try {
         const response = await fetch('/api/burnt');
         const data = await response.json();
-
         if (!response.ok) {
           throw new Error(data.message || 'Failed to fetch burnt supply');
         }
 
-        setBurnt(data.burnt);
+        const burntValue = data.burnt;
+        if (typeof burntValue === 'number') {
+          const formattedValue = addCommas(burntValue); // Apply addCommas here
+          setFormattedBurnt(formattedValue);
+        } else {
+          throw new Error('Invalid burnt value');
+        }
+
+        setBurnt(burntValue);
       } catch (error) {
         setError(error.message);
         console.error('Error:', error);
       } finally {
-        setLoading(false);
+        setLoadingBurnt(false);
       }
     }
-
     fetchBurnt();
   }, []);
 
+  // Fetch locked data
   useEffect(() => {
     async function fetchLocked() {
+      setLoadingLocked(true);
       try {
         const response = await fetch('/api/lock');
         const data = await response.json();
-
         if (!response.ok) {
           throw new Error(data.message || 'Failed to fetch locked supply');
         }
-
-        setLocked(data.lock);
+        const formattedLocked = addCommas(data.lock); // Apply addCommas here
+        setLocked(formattedLocked);
       } catch (error) {
         setError(error.message);
         console.error('Error:', error);
       } finally {
-        setLoading(false);
+        setLoadingLocked(false);
       }
     }
-
     fetchLocked();
   }, []);
 
@@ -170,14 +193,14 @@ export default function Home() {
             <div className="grid grid-cols-1 gap-4">
               <div className="px-8 py-4 rounded-md text-white bg-gradient-to-b from-orange-500 to-[#FF0000]">
                 <h1 className="flex flex-col">
-                  <span className="font-bold text-2xl">{burnt.toLocaleString()}</span>
+                  <span className="font-bold text-2xl">{formattedBurnt}</span>
                   <span>Total burnt from initial supply</span>
                 </h1>
               </div>
 
               <div className="px-8 py-4 rounded-md text-black bg-gradient-to-b from-white to-neutral-300 ">
                 <h1 className="flex flex-col">
-                  <span className="font-bold text-2xl">{supply.toLocaleString()}</span>
+                  <span className="font-bold text-2xl">{supply}</span>
                   <span>Total supply</span>
                 </h1>
               </div>
@@ -191,14 +214,14 @@ export default function Home() {
 
               <div className="px-8 py-4 rounded-md text-white bg-gradient-to-b from-green-500 to-green-900  ">
                 <h1 className="flex flex-col">
-                  <span className="font-bold text-2xl">{circulatorySupply.toLocaleString()}</span>
+                  <span className="font-bold text-2xl">{circulatorySupply}</span>
                   <span>Circulatory supply</span>
                 </h1>
               </div>
 
               <div className="px-8 py-4 rounded-md text-white bg-gradient-to-b from-neutral-500 to-neutral-900">
                 <h1 className="flex flex-col">
-                  <span className="font-bold text-2xl">{locked.toLocaleString()}</span>
+                  <span className="font-bold text-2xl">{locked}</span>
                   <span>Locked supply</span>
                 </h1>
               </div>
