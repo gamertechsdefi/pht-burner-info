@@ -131,7 +131,11 @@ export default function Home() {
     }
 
     fetchLocked();
-  }, [])
+  }, []);
+
+  if (loading) {
+    return (<div>Loading...</div>);
+  }
 
 
   return (
