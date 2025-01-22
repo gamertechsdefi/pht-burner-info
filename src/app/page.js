@@ -148,7 +148,7 @@ export default function Home() {
             <h1 className="flex flex-row gap-4 items-center">
               <span>PHT Price:</span>
               <span className="font-bold text-orange-400">${tokenData?.price.toFixed(6)}</span>
-              <span className="bg-neutral-900 px-2 py-1 rounded-lg text-sm">{tokenData?.priceChange24h.toFixed(2)}%</span>
+              <span className="bg-neutral-900 px-4 py-1 rounded-lg text-sm">{tokenData?.priceChange24h.toFixed(2)}%</span>
             </h1>
 
             <h1 className="flex flex-row gap-4">
@@ -167,31 +167,42 @@ export default function Home() {
 
         <section className="mt-8 md:mt-16 flex flex-col md:flex-row md:gap-32 md:mx-16">
           <div>
-            <div className="bg-gradient-to-b from-neutral-100 to-neutral-300 my-4 text-neutral-900 pl-8 pr-16 py-8 rounded-md flex flex-col gap-4 items-start">
-              <h1 className="flex flex-col">
-                <span className="font-bold text-xl text-[#FF0000]">{burnt}</span>
-                <span>Total burnt from initial supply</span>
-              </h1>
+            <div className="grid grid-cols-1 gap-4">
+              <div className="px-8 py-4 rounded-md text-white bg-gradient-to-b from-orange-500 to-[#FF0000]">
+                <h1 className="flex flex-col">
+                  <span className="font-bold text-2xl">{burnt.toLocaleString()}</span>
+                  <span>Total burnt from initial supply</span>
+                </h1>
+              </div>
 
-              <h1 className="flex flex-col">
-                <span className="font-bold text-xl">10,000,000</span>
-                <span>Max total supply</span>
-              </h1>
+              <div className="px-8 py-4 rounded-md text-black bg-gradient-to-b from-white to-neutral-300 ">
+                <h1 className="flex flex-col">
+                  <span className="font-bold text-2xl">{supply.toLocaleString()}</span>
+                  <span>Total supply</span>
+                </h1>
+              </div>
 
-              <h1 className="flex flex-col">
-                <span className="font-bold text-xl">{supply}</span>
-                <span>Total Supply</span>
-              </h1>
+              <div className="px-8 py-4 rounded-md text-black bg-gradient-to-b from-white to-neutral-300 ">
+                <h1 className="flex flex-col">
+                  <span className="font-bold text-2xl">10,000,000</span>
+                  <span>Max total supply</span>
+                </h1>
+              </div>
 
-              <h1 className="flex flex-col">
-                <span className="font-bold text-xl">{circulatorySupply}</span>
-                <span>Circulatory supply</span>
-              </h1>
+              <div className="px-8 py-4 rounded-md text-white bg-gradient-to-b from-green-500 to-green-900  ">
+                <h1 className="flex flex-col">
+                  <span className="font-bold text-2xl">{circulatorySupply.toLocaleString()}</span>
+                  <span>Circulatory supply</span>
+                </h1>
+              </div>
 
-              <h1 className="flex flex-col">
-                <span className="font-bold text-xl">{locked}</span>
-                <span>Locked supply</span>
-              </h1>
+              <div className="px-8 py-4 rounded-md text-white bg-gradient-to-b from-neutral-500 to-neutral-900">
+                <h1 className="flex flex-col">
+                  <span className="font-bold text-2xl">{locked.toLocaleString()}</span>
+                  <span>Locked supply</span>
+                </h1>
+              </div>
+
             </div>
 
             {/* <div className="bg-gradient-to-b from-neutral-100 to-neutral-300 text-neutral-900 pl-8 pr-16 py-8 rounded-md flex flex-col gap-2 items-start">
@@ -253,7 +264,7 @@ function Header() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button 
+        <button
           className="md:hidden flex items-center px-3 py-2 border border-neutral-300 rounded text-neutral-700"
           onClick={toggleMenu}
           aria-label="Toggle menu"
@@ -265,23 +276,23 @@ function Header() {
       {/* Mobile Menu */}
       <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'} bg-white border-t border-neutral-200 mt-2`}>
         <div className="px-2 pt-2 pb-3 space-y-1">
-          <Link 
-            href="#" 
-            className="block px-3 py-2 rounded-md text-base font-medium text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100" 
+          <Link
+            href="#"
+            className="block px-3 py-2 rounded-md text-base font-medium text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
             onClick={toggleMenu}
           >
             Home
           </Link>
-          <Link 
-            href="#" 
-            className="block px-3 py-2 rounded-md text-base font-medium text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100" 
+          <Link
+            href="#"
+            className="block px-3 py-2 rounded-md text-base font-medium text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
             onClick={toggleMenu}
           >
             Burns
           </Link>
-          <Link 
-            href="https://www.phoenixtoken.community" 
-            className="block px-3 py-2 rounded-md text-base font-medium text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100" 
+          <Link
+            href="https://www.phoenixtoken.community"
+            className="block px-3 py-2 rounded-md text-base font-medium text-neutral-900 hover:text-neutral-700 hover:bg-neutral-100"
             onClick={toggleMenu}
           >
             Phoenix Token

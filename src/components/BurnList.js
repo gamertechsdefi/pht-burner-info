@@ -29,7 +29,7 @@ function BurnsDisplay() {
     if (isLoading) return <div>Loading burns...</div>;
 
     return (
-        <div>
+        <div className='py-8 md:py-0'>
             <h2 className="text-lg font-bold mb-2">Recent Burns</h2>
             <div className="burns-list-container h-96 overflow-y-auto border border-gray-300 rounded w-full md:w-[200%]">
                 <ul className="divide-y divide-gray-200">
