@@ -1,7 +1,6 @@
 export async function getTokenTotalSupply() {
-
   try {
-    const response = await fetch("https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=0x885c99a787BE6b41cbf964174C771A9f7ec48e04&apikey=9IFFYSFYPYXI6KAWB3ATRMCHH8DZBJATRH");
+    const response = await fetch(`https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=0x885c99a787BE6b41cbf964174C771A9f7ec48e04&apikey=${process.env.BSCSCAN_API_KEY}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -22,9 +21,8 @@ export async function getTokenTotalSupply() {
 }
 
 export async function getTokenCSupply() {
-
   try {
-    const response = await fetch("https://api.bscscan.com/api?module=stats&action=tokenCsupply&contractaddress=0x885c99a787BE6b41cbf964174C771A9f7ec48e04&apikey=9IFFYSFYPYXI6KAWB3ATRMCHH8DZBJATRH");
+    const response = await fetch(`https://api.bscscan.com/api?module=stats&action=tokenCsupply&contractaddress=0x885c99a787BE6b41cbf964174C771A9f7ec48e04&apikey=${process.env.BSCSCAN_API_KEY}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -45,9 +43,8 @@ export async function getTokenCSupply() {
 }
 
 export async function getBurnAmount() {
-
   try {
-    const response = await fetch("https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=0x885c99a787BE6b41cbf964174C771A9f7ec48e04&address=0x000000000000000000000000000000000000dEaD&tag=latest&apikey=9IFFYSFYPYXI6KAWB3ATRMCHH8DZBJATRH");
+    const response = await fetch(`https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=0x885c99a787BE6b41cbf964174C771A9f7ec48e04&address=0x000000000000000000000000000000000000dEaD&tag=latest&apikey=${process.env.BSCSCAN_API_KEY}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -59,17 +56,17 @@ export async function getBurnAmount() {
       const totalSupply = parseInt(data.result) / Math.pow(10, 18);
       return totalSupply;
     } else {
-      throw new Error(data.message || 'Failed to fetch token supply');
+      throw new Error(data.message || 'Failed to fetch burn amount');
     }
   } catch (error) {
-    console.error('Error fetching token supply:', error);
+    console.error('Error fetching burn amount:', error);
     throw error;
   }
 }
 
 export async function getLockAmount() {
   try {
-    const response = await fetch("https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=0x885c99a787BE6b41cbf964174C771A9f7ec48e04&address=0x407993575c91ce7643a4d4cCACc9A98c36eE1BBE&tag=latest&apikey=9IFFYSFYPYXI6KAWB3ATRMCHH8DZBJATRH");
+    const response = await fetch(`https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=0x885c99a787BE6b41cbf964174C771A9f7ec48e04&address=0x407993575c91ce7643a4d4cCACc9A98c36eE1BBE&tag=latest&apikey=${process.env.BSCSCAN_API_KEY}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -81,47 +78,50 @@ export async function getLockAmount() {
       const totalSupply = parseInt(data.result) / Math.pow(10, 18);
       return totalSupply;
     } else {
-      throw new Error(data.message || 'Failed to fetch token supply');
+      throw new Error(data.message || 'Failed to fetch lock amount');
     }
+  } catch (error) {
+    console.error('Error fetching lock amount:', error);
+    throw error;
+  }
+}
+
+async function getTokenSupply() {
+  try {
+    const response = await fetch(`https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=0x885c99a787BE6b41cbf964174C771A9f7ec48e04&apikey=${process.env.BSCSCAN_API_KEY}`);
+    const data = await response.json();
+    
+    if (data.status !== '1' || data.message !== 'OK') {
+      throw new Error('Failed to fetch token supply');
+    }
+
+    // Convert from wei to token units (assuming 18 decimals)
+    return parseInt(data.result) / Math.pow(10, 18);
   } catch (error) {
     console.error('Error fetching token supply:', error);
     throw error;
   }
 }
 
-async function getTokenSupply() {
-
-  const response = await fetch(
-    "https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=0x885c99a787BE6b41cbf964174C771A9f7ec48e04&apikey=9IFFYSFYPYXI6KAWB3ATRMCHH8DZBJATRH"
-  );
-
-  const data = await response.json();
-  
-  if (data.status !== '1' || data.message !== 'OK') {
-    throw new Error('Failed to fetch token supply');
-  }
-
-  // Convert from wei to token units (assuming 18 decimals)
-  return parseInt(data.result) / Math.pow(10, 18);
-}
-
 async function getDexPrice() {
+  try {
+    const response = await fetch("https://api.dexscreener.com/latest/dex/tokens/0x885c99a787BE6b41cbf964174C771A9f7ec48e04");
 
-  const response = await fetch(
-    "https://api.dexscreener.com/latest/dex/tokens/0x885c99a787BE6b41cbf964174C771A9f7ec48e04"
-  );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    
+    if (!data.pairs || data.pairs.length === 0) {
+      throw new Error('No trading pairs found for this token');
+    }
+
+    return data.pairs[0];
+  } catch (error) {
+    console.error('Error fetching Dex price:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  
-  if (!data.pairs || data.pairs.length === 0) {
-    throw new Error('No trading pairs found for this token');
-  }
-
-  return data.pairs[0];
 }
 
 export async function getTokenData() {
