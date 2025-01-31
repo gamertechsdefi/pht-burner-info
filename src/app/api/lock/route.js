@@ -1,13 +1,24 @@
-import { NextResponse } from 'next/server';
-import { getLockAmount } from '@/utils/tokenInfo';  // Adjust the import path based on your file structure
+// pages/api/getLockAmount.js
 
-export async function GET() {
+import { NextResponse } from 'next/server';
+import { getLockAmount } from '@/utils/getLockAmount';  // Adjust the import path based on your file structure
+
+export async function GET(req) {
   try {
-    const lock = await getLockAmount();
-    return NextResponse.json({ lock });
+    const tokenName = req.nextUrl.searchParams.get('tokenName');
+
+    if (!tokenName) {
+      return NextResponse.json(
+        { message: 'Token name is required' },
+        { status: 400 }
+      );
+    }
+
+    const lockAmount = await getLockAmount(tokenName);
+    return NextResponse.json({ lockAmount });
   } catch (error) {
     return NextResponse.json(
-      { message: 'Error fetching token supply', error: error.message },
+      { message: 'Error fetching lock amount', error: error.message },
       { status: 500 }
     );
   }

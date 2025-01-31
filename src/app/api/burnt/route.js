@@ -1,13 +1,31 @@
 import { NextResponse } from 'next/server';
-import { getBurnAmount } from '@/utils/tokenInfo';  // Adjust the import path based on your file structure
+import { getBurnAmount } from '@/utils/getBurnAmount';
 
-export async function GET() {
+export async function GET(req) {
   try {
-    const burnt = await getBurnAmount();
-    return NextResponse.json({ burnt });
+    // Extract tokenName from query parameters
+    const tokenName = req.nextUrl.searchParams.get('tokenName');
+
+    // If tokenName is not provided, return a 400 error
+    if (!tokenName) {
+      return NextResponse.json(
+        { error: 'Token name is required' },
+        { status: 400 }
+      );
+    }
+
+    // Fetch burn amount
+    const burnData = await getBurnAmount(tokenName);
+
+    // Ensure burnData is a number
+    const burnt = typeof burnData === 'object' && burnData.value ? burnData.value : burnData;
+
+    // Return formatted response
+    return NextResponse.json({ burnt: burnt || 0 });
   } catch (error) {
+    console.error('Error fetching burn amount:', error);
     return NextResponse.json(
-      { message: 'Error fetching token supply', error: error.message },
+      { error: 'Failed to fetch burn amount', details: error.message },
       { status: 500 }
     );
   }
