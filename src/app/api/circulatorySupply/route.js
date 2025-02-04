@@ -1,7 +1,7 @@
 // pages/api/tokenTotalSupply.js
 
 import { NextResponse } from 'next/server';
-import { getTokenCSupply } from '@/utils/getTokenCSupply';
+import { getNetCirculatingSupply } from '@/utils/getTokenCSupply';
 
 export async function GET(req) {
   try {
@@ -17,7 +17,7 @@ export async function GET(req) {
     }
 
     // Call the getTokenTotalSupply function with the tokenName
-    const totalCSupply = await getTokenCSupply(tokenName);
+    const totalCSupply = await getNetCirculatingSupply(tokenName);
     
     // Return the total supply
     return NextResponse.json({ totalCSupply });
