@@ -101,19 +101,19 @@ export default function HomePage() {
                 <h1>{tokenName?.toUpperCase()} Price:</h1>
                 <h1 className='flex flex-row items-center gap-2'>
                   <span>${tokenData?.price?.toFixed(11)}</span>
-                  <span className='bg-neutral-700 text-white px-4 py-2 rounded-md'>{tokenData?.priceChange24h?.toLocaleString()}%</span>
+                  <span className='bg-neutral-700 text-white px-4 py-2 rounded-md'>{tokenData?.priceChange24h.toLocaleString()}%</span>
                 </h1>
               </div>
               <div className='flex flex-row gap-2'>
                 <h1>MarketCap:</h1>
                 <h1>
-                  <span>${tokenData?.marketCap?.toLocaleString() || "N/A"}</span>
+                  <span>${tokenData?.marketCap.toLocaleString() || "N/A"}</span>
                 </h1>
               </div>
               <div className='flex flex-row gap-2'>
                 <h1>Volume:</h1>
                 <h1>
-                  <span>${tokenData?.volume24h?.toLocaleString() || "N/A"}</span>
+                  <span>${tokenData?.volume24h.toLocaleString() || "N/A"}</span>
                 </h1>
               </div>
             </section>
