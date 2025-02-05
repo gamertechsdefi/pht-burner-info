@@ -9,6 +9,7 @@ const tokenList = [
     "Water Rabbit Token (WAR)",
     "Yukan Token (YUKAN)",
     "BTC Dragon Token (BTCDRAGON)",
+    "Nene (NENE)",
     // Add more tokens as needed
 ];
 

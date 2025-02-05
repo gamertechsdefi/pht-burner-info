@@ -8,6 +8,7 @@ async function getBurnAmount(tokenName) {
           WAR: { contractAddress: '0x57bfe2af99aeb7a3de3bc0c42c22353742bfd20d', decimals: 18 },
           YUKAN: { contractAddress: '0xd086B849a71867731D74D6bB5Df4f640de900171', decimals: 9 },
           BTCDRAGON: { contractAddress: '0x1ee8a2f28586e542af677eb15fd00430f98d8fd8', decimals: 18 },
+          NENE: { contractAddress: '0x551877C1A3378c3A4b697bE7f5f7111E88Ab4Af3', decimals: 18 },
           // Add more tokens as needed
       };
 
@@ -71,6 +72,10 @@ async function getTokenCSupply(tokenName) {
               contractAddress: '0x1ee8a2f28586e542af677eb15fd00430f98d8fd8', 
               decimals: 18 
           },
+          NENE: { 
+            contractAddress: '0x551877C1A3378c3A4b697bE7f5f7111E88Ab4Af3', 
+            decimals: 18 
+        },
           // Add more tokens as needed
       };
 
@@ -116,6 +121,7 @@ export async function getDexPrice(tokenName) {
         WAR: { contractAddress: '0x57bfe2af99aeb7a3de3bc0c42c22353742bfd20d', decimals: 18 },
         YUKAN: { contractAddress: '0xd086B849a71867731D74D6bB5Df4f640de900171', decimals: 9 },
         BTCDRAGON: { contractAddress: '0x1ee8a2f28586e542af677eb15fd00430f98d8fd8', decimals: 18 },
+        NENE: { contractAddress: '0x551877C1A3378c3A4b697bE7f5f7111E88Ab4Af3', decimals: 18 },
         // Add more tokens as needed
     };
 
@@ -181,6 +187,7 @@ export async function getTokenData(tokenName) {
               contractAddress: '0x1ee8a2f28586e542af677eb15fd00430f98d8fd8', 
               decimals: 18 
           },
+          NENE: { contractAddress: '0x551877C1A3378c3A4b697bE7f5f7111E88Ab4Af3', decimals: 18 },
           // Add more tokens as needed
       };
 

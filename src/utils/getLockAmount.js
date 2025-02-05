@@ -26,6 +26,7 @@ export async function getLockAmount(tokenName) {
           contractAddress: '0x1ee8a2f28586e542af677eb15fd00430f98d8fd8', 
           decimals: 18 
         },
+        NENE: { contractAddress: '0x551877C1A3378c3A4b697bE7f5f7111E88Ab4Af3', decimals: 18 },
         // Add more tokens as needed
       };
   
