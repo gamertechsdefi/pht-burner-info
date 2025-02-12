@@ -10,6 +10,7 @@ const tokenList = [
     "Yukan Token (YUKAN)",
     "BTC Dragon Token (BTCDRAGON)",
     "Nene (NENE)",
+    "OciCat Token (OciCat)",
     // Add more tokens as needed
 ];
 

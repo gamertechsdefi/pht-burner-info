@@ -9,6 +9,7 @@ export async function getDexPrice(tokenName) {
       YUKAN: { contractAddress: '0xd086B849a71867731D74D6bB5Df4f640de900171', decimals: 9 },
       BTCDRAGON: { contractAddress: '0x1ee8a2f28586e542af677eb15fd00430f98d8fd8', decimals: 18 },
       NENE: { contractAddress: '0x551877C1A3378c3A4b697bE7f5f7111E88Ab4Af3', decimals: 18 },
+      OCICAT: {contractAddress: '0x37Fe635D1e25B2F7276C1B9dBBcc7b087f80C050', decimals: 18},
       // Add more tokens as needed
     };
 

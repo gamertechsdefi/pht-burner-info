@@ -57,6 +57,12 @@ export async function GET(request) {
           '0x0000000000000000000000000000000000000000',
         ]
       },
+      OCICAT: {
+        contractAddress: '0x37Fe635D1e25B2F7276C1B9dBBcc7b087f80C050',
+        burnAddresses: [
+          '0x0000000000000000000000000000000000000000',
+        ]
+      },
       // Add more tokens here as needed
     };
 
