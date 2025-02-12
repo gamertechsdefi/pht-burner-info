@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getBurnAmount } from '@/utils/getBurnAmount';
+import { getBurntAmount } from '@/utils/getBurnAmount';
 
 export async function GET(req) {
   try {
@@ -15,7 +15,7 @@ export async function GET(req) {
     }
 
     // Fetch burn amount
-    const burnData = await getBurnAmount(tokenName);
+    const burnData = await getBurntAmount(tokenName);
 
     // Ensure burnData is a number
     const burnt = typeof burnData === 'object' && burnData.value ? burnData.value : burnData;

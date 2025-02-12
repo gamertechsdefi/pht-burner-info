@@ -9,13 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ethersproject/abi": "^5.7.0",
-    "@ethersproject/providers": "^5.7.2",
-    "@moralisweb3/common-evm-utils": "^2.27.2",
+    "@vercel/analytics": "^1.5.0",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
+    "ethers": "^6.13.5",
     "moralis": "^2.27.2",
     "next": "15.1.5",
+    "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

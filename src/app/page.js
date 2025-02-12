@@ -25,6 +25,7 @@ export default function HomePage() {
   const [formattedBurnt, setFormattedBurnt] = useState("Loading...");
   const [formattedCSupply, setFormattedCSupply] = useState("Loading...");
   const [formattedLocked, setFormattedLocked] = useState("Loading...");
+  const [formattedHolders, setFormattedHolders] = useState("Loading");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -58,6 +59,10 @@ export default function HomePage() {
         const supplyResponse = await fetch(`/api/tokenSupply?tokenName=${token}`);
         const supplyData = await supplyResponse.json();
         setFormattedSupply(addCommas(supplyData.totalSupply));
+
+        const holdersResponse = await fetch(`/api/holders?tokenName=${token}`);
+        const holdersData = await holdersResponse.json();
+        setFormattedHolders(addCommas(holdersData.holdersCount));
 
         const burntResponse = await fetch(`/api/burnt?tokenName=${token}`);
         const burntData = await burntResponse.json();
@@ -114,6 +119,12 @@ export default function HomePage() {
                 <h1>Volume:</h1>
                 <h1>
                   <span>${tokenData?.volume24h.toLocaleString() || "N/A"}</span>
+                </h1>
+              </div>
+              <div className='flex flex-row gap-2'>
+                <h1>Holders:</h1>
+                <h1>
+                  <span>{formattedHolders || "N/A"}</span>
                 </h1>
               </div>
             </section>

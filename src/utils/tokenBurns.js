@@ -51,7 +51,7 @@ export async function fetchBurns(contractAddress, burnAddresses = []) {
         apikey: process.env.BSCSCAN_API_KEY,
         sort: 'desc', // Sort by block number descending (most recent first)
         page: 1,
-        offset: 50, // Limit to 100 recent transactions
+        offset: 100, // Limit to 100 recent transactions
       },
     });
 
