@@ -105,25 +105,25 @@ export default function HomePage() {
               <div className='flex flex-row items-center gap-2'>
                 <h1>{tokenName?.toUpperCase()} Price:</h1>
                 <h1 className='flex flex-row items-center gap-2'>
-                  <span>${tokenData?.price?.toFixed(11)}</span>
+                  <span className='font-medium'>${tokenData?.price?.toFixed(11)}</span>
                   <span className='bg-neutral-700 text-white px-4 py-2 rounded-md'>{tokenData?.priceChange24h.toLocaleString()}%</span>
                 </h1>
               </div>
               <div className='flex flex-row gap-2'>
                 <h1>MarketCap:</h1>
-                <h1>
+                <h1 className='font-medium'>
                   <span>${tokenData?.marketCap.toLocaleString() || "N/A"}</span>
                 </h1>
               </div>
               <div className='flex flex-row gap-2'>
                 <h1>Volume:</h1>
-                <h1>
+                <h1 className='font-medium'>
                   <span>${tokenData?.volume24h.toLocaleString() || "N/A"}</span>
                 </h1>
               </div>
               <div className='flex flex-row gap-2'>
                 <h1>Holders:</h1>
-                <h1>
+                <h1 className='font-medium'>
                   <span>{formattedHolders || "N/A"}</span>
                 </h1>
               </div>
@@ -140,8 +140,8 @@ export default function HomePage() {
                   {/* Overlay with opacity */}
                   <div className="absolute top-0 rounded-2xl left-0 w-full h-full bg-[#ff0000] opacity-50 z-1" />
                   <div className="relative z-10 text-center">
-                    <h1 className="text-xl text-white">TOTAL BURNT</h1>
-                    <h1 className="text-3xl font-bold text-white">{formattedBurnt}</h1>
+                  <h1 className="text-2xl font-bold text-white">{formattedBurnt}</h1>
+                    <h1 className="text-md text-white">TOTAL BURNT</h1>
                   </div>
                 </div>
                 <DataCard title="Total Supply" value={formattedSupply} bg="bg-white text-black" />
