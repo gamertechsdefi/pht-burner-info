@@ -61,10 +61,24 @@ const formatDisplayValue = (value, defaultValue = "N/A") => {
       return defaultValue;
     }
 
-    // Format based on value size
+    // Special handling for very small numbers (like token prices)
+    if (Math.abs(num) < 0.000001) {
+      return num.toExponential(2);
+    }
+
+    // For small numbers (less than 1) use more decimal places
+    if (Math.abs(num) < 1) {
+      return num.toLocaleString('en-US', {
+        minimumFractionDigits: 8,
+        maximumFractionDigits: 11,
+        useGrouping: true
+      });
+    }
+
+    // For regular numbers use standard formatting
     return new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: Math.abs(num) < 1 ? 11 : 2,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
       notation: num > 1000000 ? 'compact' : 'standard'
     }).format(num);
   } catch (error) {
@@ -105,6 +119,29 @@ const formatLargeNumber = (number) => {
   } catch (error) {
     console.error('Error formatting large number:', error);
     return '0.00';
+  }
+};
+
+// Add this new function for formatting token prices
+const formatTokenPrice = (price) => {
+  try {
+    if (!price) return "0.00000000000";
+    
+    // Convert to number if it's a string
+    const num = typeof price === 'string' ? parseFloat(price) : price;
+    
+    // Check if it's a valid number
+    if (isNaN(num)) return "0.00000000000";
+    
+    // Format with 11 decimal places
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 11,
+      maximumFractionDigits: 11,
+      useGrouping: true // This will add commas for thousands
+    });
+  } catch (error) {
+    console.error('Error formatting token price:', error);
+    return "0.00000000000";
   }
 };
 
@@ -255,10 +292,10 @@ export default function HomePage() {
                   <h1>{tokenName?.toUpperCase()} Price:</h1>
                   <h1 className='flex flex-row items-center gap-2'>
                     <span className='font-medium'>
-                      ${tokenData?.price ? formatDisplayValue(tokenData.price, "0.00") : "0.00"}
+                      ${formatTokenPrice(tokenData?.price)}
                     </span>
                     <span className='bg-neutral-700 text-white px-4 py-2 rounded-md'>
-                      {tokenData?.priceChange24h ? formatDisplayValue(tokenData.priceChange24h, "0.00") : "0.00"}%
+                      {tokenData?.priceChange24h?.toFixed(2) || "0.00"}%
                     </span>
                   </h1>
                 </div>
