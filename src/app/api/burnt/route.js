@@ -1,32 +1,25 @@
-import { NextResponse } from 'next/server';
 import { getBurntAmount } from '@/utils/getBurnAmount';
 
-export async function GET(req) {
-  try {
-    // Extract tokenName from query parameters
-    const tokenName = req.nextUrl.searchParams.get('tokenName');
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const tokenName = searchParams.get('tokenName');
 
-    // If tokenName is not provided, return a 400 error
+  try {
     if (!tokenName) {
-      return NextResponse.json(
-        { error: 'Token name is required' },
-        { status: 400 }
-      );
+      return new Response(JSON.stringify({ error: 'Token name is required' }), {
+        status: 400,
+      });
     }
 
-    // Fetch burn amount
-    const burnData = await getBurntAmount(tokenName);
-
-    // Ensure burnData is a number
-    const burnt = typeof burnData === 'object' && burnData.value ? burnData.value : burnData;
-
-    // Return formatted response
-    return NextResponse.json({ burnt: burnt || 0 });
+    const burnt = await getBurntAmount(tokenName);
+    
+    return new Response(JSON.stringify({ burnt }), {
+      status: 200,
+    });
   } catch (error) {
-    console.error('Error fetching burn amount:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch burn amount', details: error.message },
-      { status: 500 }
-    );
+    console.error('Error:', error);
+    return new Response(JSON.stringify({ error: 'Failed to fetch burn amount' }), {
+      status: 500,
+    });
   }
 }
