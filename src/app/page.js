@@ -20,21 +20,56 @@ const addCommas = (number) => {
       return '0';
     }
     
-    // Convert to number if it's a string
-    const num = typeof number === 'string' ? parseFloat(number) : number;
+    // Remove any existing commas and non-numeric characters except decimal point
+    const cleanNumber = String(number).replace(/[^0-9.-]/g, '');
+    
+    // Convert to number
+    const num = parseFloat(cleanNumber);
     
     // Check if it's a valid number
     if (isNaN(num)) {
       return '0';
     }
     
-    return num.toLocaleString('en-US', {
+    // Format with commas and fixed decimal places
+    return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    });
+      maximumFractionDigits: 2,
+      notation: 'standard'
+    }).format(num);
   } catch (error) {
-    console.error('Error formatting number:', error);
+    console.error('Error in addCommas:', error);
     return '0';
+  }
+};
+
+const formatDisplayValue = (value, defaultValue = "N/A") => {
+  try {
+    // Handle null, undefined, or empty values
+    if (value === null || value === undefined || value === '') {
+      return defaultValue;
+    }
+
+    // Remove any existing commas and non-numeric characters except decimal point
+    const cleanValue = String(value).replace(/[^0-9.-]/g, '');
+    
+    // Convert to number
+    const num = parseFloat(cleanValue);
+
+    // Check if it's a valid number
+    if (isNaN(num)) {
+      return defaultValue;
+    }
+
+    // Format based on value size
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: Math.abs(num) < 1 ? 11 : 2,
+      notation: num > 1000000 ? 'compact' : 'standard'
+    }).format(num);
+  } catch (error) {
+    console.error('Error in formatDisplayValue:', error);
+    return defaultValue;
   }
 };
 
@@ -63,54 +98,66 @@ export default function HomePage() {
     setTokenName(token);
 
     try {
-      // Fetch token data
-      const response = await fetch(`/api/tokenData?tokenName=${token}`);
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.error || "Failed to fetch tokenData");
-
-      setTokenData(data);
-
-      // Fetch all supply data and 24h burns in parallel
-      const [supplyData, holdersData, burntData, circulatoryData, lockedData, burned24hData] = await Promise.all([
-        fetch(`/api/tokenSupply?tokenName=${token}`).then(res => res.json()),
-        fetch(`/api/holders?tokenName=${token}`).then(res => res.json()),
-        fetch(`/api/burnt?tokenName=${token}`).then(res => res.json()),
-        fetch(`/api/circulatorySupply?tokenName=${token}`).then(res => res.json()),
-        fetch(`/api/lock?tokenName=${token}`).then(res => res.json()),
-        fetch(`/api/0xbalance?tokenName=${token}`).then(res => res.json())
+      const [
+        tokenDataRes,
+        supplyData,
+        holdersData,
+        burntData,
+        circulatoryData,
+        lockedData,
+        burned24hData
+      ] = await Promise.all([
+        fetch(`/api/tokenData?tokenName=${token}`),
+        fetch(`/api/tokenSupply?tokenName=${token}`),
+        fetch(`/api/holders?tokenName=${token}`),
+        fetch(`/api/burnt?tokenName=${token}`),
+        fetch(`/api/circulatorySupply?tokenName=${token}`),
+        fetch(`/api/lock?tokenName=${token}`),
+        fetch(`/api/0xbalance?tokenName=${token}`)
       ]);
 
-      setFormattedSupply(addCommas(supplyData.totalSupply));
-      setFormattedHolders(addCommas(holdersData.holdersCount));
-      setFormattedBurnt(addCommas(burntData.burnt));
-      setFormattedCSupply(addCommas(circulatoryData.totalCSupply));
-      setFormattedLocked(addCommas(lockedData.lockAmount));
-      setBurned24h(burned24hData.totalBurnedToday || "0.00");
+      const [
+        tokenData,
+        supply,
+        holders,
+        burnt,
+        circulatory,
+        locked,
+        burned24h
+      ] = await Promise.all([
+        tokenDataRes.json(),
+        supplyData.json(),
+        holdersData.json(),
+        burntData.json(),
+        circulatoryData.json(),
+        lockedData.json(),
+        burned24hData.json()
+      ]);
+
+      if (!tokenDataRes.ok) throw new Error(tokenData.error || "Failed to fetch token data");
+
+      setTokenData(tokenData);
+      setFormattedSupply(addCommas(supply.totalSupply || 0));
+      setFormattedHolders(addCommas(holders.holdersCount || 0));
+      setFormattedBurnt(addCommas(burnt.burnt || 0));
+      setFormattedCSupply(addCommas(circulatory.totalCSupply || 0));
+      setFormattedLocked(addCommas(locked.lockAmount || 0));
+      setBurned24h(burned24h.totalBurnedToday || "0.00");
 
     } catch (error) {
-      console.error("Fetch Error:", error.message);
+      console.error("Fetch Error:", error);
       setError(error.message);
       setTokenData(null);
       setBurned24h("0.00");
+      // Reset other formatted values to safe defaults
+      setFormattedSupply("0");
+      setFormattedHolders("0");
+      setFormattedBurnt("0");
+      setFormattedCSupply("0");
+      setFormattedLocked("0");
     }
 
     setLoading(false);
-  };
-
-  const formatDisplayValue = (value, defaultValue = "N/A") => {
-    try {
-      if (value === null || value === undefined || value === '') {
-        return defaultValue;
-      }
-      return value.toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: value < 1 ? 11 : 2
-      });
-    } catch (error) {
-      console.error('Error formatting display value:', error);
-      return defaultValue;
-    }
   };
 
   return (
