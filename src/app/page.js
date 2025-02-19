@@ -7,11 +7,10 @@ import Header from '@/components/Header';
 import SearchBar from '@/components/SearchBar';
 import DataCard from '@/components/DataCard';
 import BurnList from '@/components/BurnList';
-import { getBurnAmount } from '@/utils/getBurnAmount';
 
 import burnImage from "/public/assets/burn-im2.jpg";
 
-const DEFAULT_TOKEN = "PHT"; // Ensure this token exists in BscScan
+const DEFAULT_TOKEN = "PHT";
 
 const addCommas = (number) => {
   try {
@@ -122,28 +121,25 @@ const formatLargeNumber = (number) => {
   }
 };
 
-// Add this new function for formatting token prices
-const formatTokenPrice = (price) => {
-  try {
-    if (!price) return "0.00000000000";
-    
-    // Convert to number if it's a string
-    const num = typeof price === 'string' ? parseFloat(price) : price;
-    
-    // Check if it's a valid number
-    if (isNaN(num)) return "0.00000000000";
-    
-    // Format with 11 decimal places
-    return num.toLocaleString('en-US', {
-      minimumFractionDigits: 11,
-      maximumFractionDigits: 11,
-      useGrouping: true // This will add commas for thousands
-    });
-  } catch (error) {
-    console.error('Error formatting token price:', error);
-    return "0.00000000000";
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Function to fetch data with retries
+async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
+      return await response.json();
+    } catch (error) {
+      console.error(`Attempt ${i + 1} failed: ${error.message}`);
+      if (i < retries - 1) {
+        await delay(delayMs);
+      } else {
+        throw error;
+      }
+    }
   }
-};
+}
 
 export default function HomePage() {
   const router = useRouter();
@@ -159,105 +155,69 @@ export default function HomePage() {
   const [burned24h, setBurned24h] = useState("0.00");
   const [lastRefresh, setLastRefresh] = useState(Date.now());
 
-  const initialTokenName = 'PHT'; // Default token
-
   useEffect(() => {
-    fetchTokenData(DEFAULT_TOKEN);
-  }, []);
-
-  useEffect(() => {
-    const refreshInterval = setInterval(() => {
-      if (tokenName) {
-        fetchTokenData(tokenName);
-        setLastRefresh(Date.now());
-      }
-    }, 60000); // Refresh every minute
-
-    return () => clearInterval(refreshInterval);
-  }, [tokenName]);
-
-  const fetchTokenData = async (token) => {
-    setLoading(true);
-    setError(null);
-    setTokenName(token);
-    
-    // Reset all states to loading state
-    setTokenData(null);
-    setFormattedSupply("Loading...");
-    setFormattedHolders("Loading...");
-    setFormattedBurnt("Loading...");
-    setFormattedCSupply("Loading...");
-    setFormattedLocked("Loading...");
-    setBurned24h("Loading...");
-
-    try {
-      const [
-        tokenDataRes,
-        supplyData,
-        holdersData,
-        burntData,
-        circulatoryData,
-        lockedData,
-        burned24hData
-      ] = await Promise.all([
-        fetch(`/api/tokenData?tokenName=${token}`),
-        fetch(`/api/tokenSupply?tokenName=${token}`),
-        fetch(`/api/holders?tokenName=${token}`),
-        fetch(`/api/burnt?tokenName=${token}`),
-        fetch(`/api/circulatorySupply?tokenName=${token}`),
-        fetch(`/api/lock?tokenName=${token}`),
-        fetch(`/api/0xbalance?tokenName=${token}`)
-      ]);
-
-      const [
-        tokenData,
-        supply,
-        holders,
-        burnt,
-        circulatory,
-        locked,
-        burned24h
-      ] = await Promise.all([
-        tokenDataRes.json(),
-        supplyData.json(),
-        holdersData.json(),
-        burntData.json(),
-        circulatoryData.json(),
-        lockedData.json(),
-        burned24hData.json()
-      ]);
-
-      if (!tokenDataRes.ok) throw new Error(tokenData.error || "Failed to fetch token data");
-
-      setTokenData(tokenData);
-      setFormattedSupply(addCommas(supply.totalSupply || 0));
-      setFormattedHolders(addCommas(holders.holdersCount || 0));
-      setFormattedBurnt(addCommas(burnt.burnt || 0));
-      setFormattedCSupply(addCommas(circulatory.totalCSupply || 0));
-      setFormattedLocked(addCommas(locked.lockAmount || 0));
-      setBurned24h(burned24h.totalBurnedToday || "0.00");
-
-    } catch (error) {
-      console.error("Fetch Error:", error);
-      setError(error.message);
-      // Reset all states to error state
+    const fetchTokenData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      // Reset all states to loading state
       setTokenData(null);
-      setBurned24h("0.00");
-      setFormattedSupply("0");
-      setFormattedHolders("0");
-      setFormattedBurnt("0");
-      setFormattedCSupply("0");
-      setFormattedLocked("0");
-    }
+      setFormattedSupply("Loading...");
+      setFormattedHolders("Loading...");
+      setFormattedBurnt("Loading...");
+      setFormattedCSupply("Loading...");
+      setFormattedLocked("Loading...");
+      setBurned24h("Loading...");
 
-    setLoading(false);
-  };
+      try {
+        // Use the internal API route with a relative path and retry logic
+        const data = await fetchWithRetry(`/api/batchData?tokenName=${tokenName}`);
+
+        // Destructure the response data
+        const {
+          tokenData,
+          supply,
+          holders,
+          burnt,
+          circulatory,
+          locked,
+          burned24h
+        } = data;
+
+        setTokenData(tokenData);
+        setFormattedSupply(addCommas(supply.totalSupply || 0));
+        setFormattedHolders(addCommas(holders.holdersCount || 0));
+        setFormattedBurnt(addCommas(burnt.burnt || 0));
+        setFormattedCSupply(addCommas(circulatory.totalCSupply || 0));
+        setFormattedLocked(addCommas(locked.lockAmount || 0));
+        setBurned24h(burned24h.totalBurnedToday || "0.00");
+        setLastRefresh(Date.now());
+
+      } catch (error) {
+        console.error("Fetch Error:", error);
+        setError("Failed to load data. Please try again.");
+        // Reset all states to error state
+        setTokenData(null);
+        setBurned24h("0.00");
+        setFormattedSupply("0");
+        setFormattedHolders("0");
+        setFormattedBurnt("0");
+        setFormattedCSupply("0");
+        setFormattedLocked("0");
+      }
+
+      setLoading(false);
+    };
+
+    fetchTokenData();
+  }, [tokenName]); 
+
 
   return (
     <div className="bg-gradient-to-b from-transparent to-orange-500 min-h-screen">
       <Header />
       <main className="px-6 md:px-8 py-16">
-        <SearchBar onSearch={fetchTokenData} />
+        <SearchBar onSearch={setTokenName} />
 
         {error && (
           <div className="text-red-500 text-center mt-4 p-4 bg-red-100 rounded-lg">
@@ -292,10 +252,10 @@ export default function HomePage() {
                   <h1>{tokenName?.toUpperCase()} Price:</h1>
                   <h1 className='flex flex-row items-center gap-2'>
                     <span className='font-medium'>
-                      ${formatTokenPrice(tokenData?.price)}
+                      ${tokenData?.price.toFixed(11) || "0.00"}
                     </span>
                     <span className='bg-neutral-700 text-white px-4 py-2 rounded-md'>
-                      {tokenData?.priceChange24h?.toFixed(2) || "0.00"}%
+                      {tokenData?.priceChange24h || "0.00"}%
                     </span>
                   </h1>
                 </div>
